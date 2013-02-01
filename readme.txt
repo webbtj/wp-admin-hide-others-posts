@@ -1,7 +1,7 @@
 === WP Admin Hide Others Posts ===
 Contributors: webbtj
 Donate link: http://webb.tj/
-Tags: comments, spam
+Tags: admin, posts
 Requires at least: 3.5
 Tested up to: 3.5
 Stable tag: 1.0
