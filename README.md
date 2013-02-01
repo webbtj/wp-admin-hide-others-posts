@@ -1,19 +1,12 @@
-# WP Admin Hide Others Posts #
-Contributors: webbtj
-
-Donate link: http://webb.tj/
-
-Tags: admin, posts
-
-Requires at least: 3.5
-
-Tested up to: 3.5
-
-Stable tag: 1.0
-
-License: GPLv2 or later
-
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+# WP Admin Hide Other's Posts #
+Contributors: webbtj  
+Donate link: http://webb.tj/  
+Tags: admin, posts  
+Requires at least: 3.5  
+Tested up to: 3.5  
+Stable tag: 1.0  
+License: GPLv2 or later  
+License URI: http://www.gnu.org/licenses/gpl-2.0.html  
 
 
 Hides posts by other authors in the admin area, manageable with a "view_others_posts" permission

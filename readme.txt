@@ -1,4 +1,4 @@
-=== WP Admin Hide Others Posts ===
+=== WP Admin Hide Other's Posts ===
 Contributors: webbtj
 Donate link: http://webb.tj/
 Tags: admin, posts
