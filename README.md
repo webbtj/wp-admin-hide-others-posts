@@ -4,7 +4,7 @@ Donate link: http://webb.tj/
 Tags: admin, posts  
 Requires at least: 3.5  
 Tested up to: 3.5  
-Stable tag: 1.0  
+Stable tag: 1.1  
 License: GPLv2 or later  
 License URI: http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -44,3 +44,6 @@ No, this only alters the list of posts as viewed in the admin area.
 
 ### 1.0 ###
 * Initial Release
+
+### 1.1 ###
+* Added settings interface to allow an admin to decide which post types will be filtered.

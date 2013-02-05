@@ -4,13 +4,17 @@
  * Plugin Name: WP Admin Hide Other's Posts
  * Author: TJ Webb
  * Author URI: http://webb.tj/
- * Version: 0.0.1
+ * Version: 1.1
  * Description: Hides posts by other authors in the admin area, manageable with a "view_others_posts" permission
  */
 
 class WPHideOthersPosts{
+	public static function filter_post_type($post_type){
+		return array_key_exists($post_type, get_option('wp_hide_others_posts_enabled'));
+	}
+
 	public static function filter($query){
-		if($query->is_admin && !current_user_can('view_others_posts')) {
+		if($query->is_admin && !current_user_can('view_others_posts') && WPHideOthersPosts::filter_post_type($query->query['post_type'])) {
 			global $user_ID;
 			$query->set('author',  $user_ID);
 		}
@@ -20,6 +24,9 @@ class WPHideOthersPosts{
 	public static function activate(){
 		$role = get_role('administrator');
 		$role->add_cap('view_others_posts');
+		if(false===get_option('wp_hide_others_posts_enabled')){
+            update_option('wp_hide_others_posts_enabled', array('post'=>1, 'page'=>1));
+        }
 	}
 
 	public static function get_views_filters(){
@@ -32,7 +39,10 @@ class WPHideOthersPosts{
 	}
 
 	public static function filter_views($view){
-		return WPHideOthersPosts::get_views();
+		global $post_type_object;
+		if(WPHideOthersPosts::filter_post_type($post_type_object->name))
+			return WPHideOthersPosts::get_views();
+		return $view;
 	}
 
 	//copied and adapted from WP_Post_List_Table
@@ -100,7 +110,7 @@ class WPHideOthersPosts{
 
 		$user = wp_get_current_user();
 
-		$cache_key = $type . '-HOP-' . $user->ID;
+		$cache_key = $type . '-HOP-' . $user->ID . rand();
 
 		$query = "SELECT post_status, COUNT( * ) AS num_posts FROM {$wpdb->posts} WHERE post_type = %s AND post_author = %d ";
 		if ( 'readable' == $perm && is_user_logged_in() ) {
@@ -130,8 +140,61 @@ class WPHideOthersPosts{
 
 		return $stats;
 	}
+
+	public static function settings_enabled_callback() {
+        $post_types = get_post_types();
+        $options = get_option('wp_hide_others_posts_enabled');
+        $banned_post_types = array('attachment', 'revision', 'nav_menu_item');
+        foreach($post_types as $post_type){
+            if(!in_array($post_type, $banned_post_types))
+                echo '<input name="wp_hide_others_posts_enabled['.$post_type.']" id="wp_hide_others_posts_enabled-'.$post_type.'" type="checkbox" value="1" class="code" ' . checked( 1, $options[$post_type], false ) . ' /> ' . get_post_type_object($post_type)->labels->name . '<br>';
+        }
+    }
+
+    public static function settings_enabled_section_callback() {
+        echo '<p>Check off any post types that will be filtered and only allow users to see posts they have authored.</p>';
+    }
+
+    public static function settings_enabled_init(){
+        add_settings_section('wp_hide_others_posts_enabled_setting_section',
+            'Enable/disable which post types will be filtered',
+            array('WPHideOthersPosts', 'settings_enabled_section_callback'),
+            'wp_hide_others_posts_enabled');
+
+        add_settings_field('wp_hide_others_posts_enabled',
+            'Filtered Post Types',
+            array('WPHideOthersPosts', 'settings_enabled_callback'),
+            'wp_hide_others_posts_enabled',
+            'wp_hide_others_posts_enabled_setting_section');
+
+        register_setting('wp_hide_others_posts_enabled','wp_hide_others_posts_enabled');
+    }
+
+    public static function settings_enabled_submenu(){
+        add_options_page('Hide Other\'s Post Options', 'Hide Other\'s Post Options', 'manage_options', 'wp_hide_others_posts_enabled', array('WPHideOthersPosts', 'settings_enabled_page'));
+    }
+
+    public static function settings_enabled_page(){
+        ?>
+        <div class="wrap">
+            <h2><?php echo __('WP Hide Other\'s Posts Settings'); ?></h2>
+            <form method="post" action="options.php"> 
+                <?php if (current_user_can('manage_options')) { ?>
+                    <?php settings_fields('wp_hide_others_posts_enabled'); ?>
+                    <?php do_settings_sections( 'wp_hide_others_posts_enabled' ); ?>
+                    <?php submit_button(); ?>
+                <?php } ?>
+            </form>
+        </div>
+        <?php
+    }
 }
 
 add_filter('pre_get_posts', array('WPHideOthersPosts', 'filter'));
 add_action('admin_init', array('WPHideOthersPosts', 'get_views_filters'));
 register_activation_hook(__FILE__, array('WPHideOthersPosts', 'activate'));
+
+
+
+add_action('admin_init', array('WPHideOthersPosts', 'settings_enabled_init'));
+add_action('admin_menu', array('WPHideOthersPosts', 'settings_enabled_submenu'));
