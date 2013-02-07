@@ -19,8 +19,6 @@ current author.
 
 == Installation ==
 
-This section describes how to install the plugin and get it working.
-
 1. Extract wp-admin-hide-others-posts.zip
 2. Upload `wp-admin-hide-others-posts/` to the `/wp-content/plugins/` directory
 3. Activate the plugin through the 'Plugins' menu in WordPress
